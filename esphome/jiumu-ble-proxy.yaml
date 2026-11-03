@@ -1,0 +1,56 @@
+substitutions:
+  # 仅用于设备节点名/显示名，可随意修改
+  name: jiumu-ble-proxy
+  friendly_name: Jiumu BLE Proxy
+  # 注意：下面是 32 字节全零的示例 key，仅供编译通过；部署前必须替换成自己的 key
+  api_key: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+  ota_password: "REPLACE_ME"
+  wifi_ssid: "REPLACE_ME"
+  wifi_password: "REPLACE_ME"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+
+# 推荐 ESP32-S3（内存更充足）；C3 也能用，但并发连接余量更小。
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+  logs:
+    esp32_ble_tracker: DEBUG
+    bluetooth_proxy: DEBUG
+    esp32_ble: DEBUG
+
+api:
+  encryption:
+    key: ${api_key}
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+  ap:
+
+# 与 bluetooth_proxy 共享连接槽；总量不要超过 5。
+esp32_ble:
+  max_connections: 3
+
+esp32_ble_tracker:
+  scan_parameters:
+    # 主动扫描才能拿到 scan response 里的设备名/Service UUID。
+    # Wi-Fi 代理不要改 interval/window，保持默认更稳定。
+    active: true
+
+bluetooth_proxy:
+  # 必须为 true，HA 才能通过代理建立 GATT 连接并写帧。
+  active: true
+  connection_slots: 3
+  cache_services: true

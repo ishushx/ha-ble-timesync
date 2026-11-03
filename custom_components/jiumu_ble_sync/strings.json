@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "手动添加九牧蓝牙校时设备",
+        "description": "仅在设备没有广播匹配的 Service UUID / 名称时使用。",
+        "data": {
+          "address": "设备地址（MAC）",
+          "model": "协议分支"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "发现九牧蓝牙设备",
+        "description": "发现 {name}（{address}）。\n自动识别分支：{model}。\n请确认后创建条目；分支可在此修正。",
+        "data": {
+          "model": "协议分支"
+        }
+      }
+    },
+    "error": {
+      "invalid_address": "地址格式无效，请填写 AA:BB:CC:DD:EE:FF 形式的 MAC。"
+    },
+    "abort": {
+      "already_configured": "该设备已经添加。"
+    }
+  },
+  "entity": {
+    "button": {
+      "sync_time": {
+        "name": "立即校时"
+      }
+    },
+    "sensor": {
+      "last_sync": {
+        "name": "最后校时时间"
+      }
+    }
+  },
+  "services": {
+    "sync_time": {
+      "name": "立即校时",
+      "description": "连接指定设备并写入一帧校时数据。"
+    }
+  }
+}

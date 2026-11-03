@@ -1,0 +1,48 @@
+{
+  "domain": "jiumu_ble_sync",
+  "name": "Jiumu BLE Time Sync",
+  "version": "0.1.0",
+  "config_flow": true,
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "dependencies": ["bluetooth", "bluetooth_adapters"],
+  "requirements": ["bleak>=0.22.0"],
+  "bluetooth": [
+    {
+      "service_uuid": "0000ff00-0000-1000-8000-00805f9b34fb",
+      "connectable": true
+    },
+    {
+      "service_uuid": "0000ffe0-0000-1000-8000-00805f9b34fb",
+      "connectable": true
+    },
+    {
+      "service_uuid": "00009900-0000-1000-8000-00805f9b34fb",
+      "connectable": true
+    },
+    {
+      "service_uuid": "0000fff0-0000-1000-8000-00805f9b34fb",
+      "connectable": true
+    },
+    {
+      "local_name": "YHD-MODULE",
+      "connectable": true
+    },
+    {
+      "local_name": "JM_Cabinet",
+      "connectable": true
+    },
+    {
+      "local_name": "JM_LEDM1",
+      "connectable": true
+    },
+    {
+      "local_name": "BXICHENG",
+      "connectable": true
+    },
+    {
+      "local_name": "BT24",
+      "connectable": true
+    }
+  ]
+}

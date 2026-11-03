@@ -1,0 +1,85 @@
+# =============================================================================
+# 备选方案：ESPHome ble_client 硬编码版（不满足“自动发现”要求）
+#
+# 限制（已核实 ESPHome 官方文档）：
+#   - ble_client 的 mac_address 是编译期 YAML 必填项，运行时无法按扫描结果改。
+#   - service_uuid / characteristic_uuid 也是编译期常量；本项目源码并未写死
+#     Characteristic UUID，必须先用 nRF Connect 或 ESPHome 日志扫描确认。
+#   - ESPHome 原生 ble_client 没有任意 notify 原始字节回调；只能配合
+#     ble_client 的 sensor/text_sensor 平台读取数值型/文本特征。
+#
+# 因此正式方案请使用 jiumu-ble-proxy.yaml + HA 自定义集成；本文件仅作兜底测试。
+# =============================================================================
+
+substitutions:
+  name: jiumu-ble-fallback
+  friendly_name: Jiumu BLE Fallback
+  api_key: "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+  ota_password: "REPLACE_ME"
+  wifi_ssid: "REPLACE_ME"
+  wifi_password: "REPLACE_ME"
+  # ↓↓↓ 必须手动替换为真实设备 MAC ↓↓↓
+  device_mac: "AA:BB:CC:DD:EE:FF"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  name_add_mac_suffix: true
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+  logs:
+    esp32_ble_tracker: DEBUG
+    ble_client: DEBUG
+
+api:
+  encryption:
+    key: ${api_key}
+  actions:
+    - action: sync_time
+      then:
+        # 扫描和连接共用射频，连接前先停止扫描
+        - esp32_ble_tracker.stop_scan:
+        - ble_client.connect: jiumu_ble
+        - delay: 1s
+        - ble_client.ble_write:
+            id: jiumu_ble
+            service_uuid: "0000FF00-0000-1000-8000-00805F9B34FB"
+            # ↓↓↓ 必须手动替换为实际可写 characteristic ↓↓↓
+            characteristic_uuid: "0000FF01-0000-1000-8000-00805F9B34FB"
+            value: !lambda |-
+              // 仅实现 FF00 主分支 6 字节帧；其它分支需按 protocol-spec.md 扩展
+              auto t = id(ha_time).now();
+              if (!t.is_valid()) return {};
+              uint8_t h = t.hour;
+              uint8_t m = t.minute;
+              uint8_t s = t.second;
+              return {0xFC, (uint8_t)(h + m + s), h, m, s, 0xFC};
+        - delay: 500ms
+        - ble_client.disconnect: jiumu_ble
+        - esp32_ble_tracker.start_scan:
+
+ota:
+  - platform: esphome
+    password: ${ota_password}
+
+wifi:
+  ssid: ${wifi_ssid}
+  password: ${wifi_password}
+  ap:
+
+esp32_ble_tracker:
+
+ble_client:
+  - id: jiumu_ble
+    mac_address: ${device_mac}
+    auto_connect: false
+
+time:
+  - platform: homeassistant
+    id: ha_time

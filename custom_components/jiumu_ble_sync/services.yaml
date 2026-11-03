@@ -1,0 +1,30 @@
+sync_time:
+  name: 立即校时
+  description: 通过当前可用的蓝牙代理连接设备并写入一帧校时数据。
+  fields:
+    address:
+      name: 设备地址
+      description: HA 蓝牙地址（通常是 MAC，如 AA:BB:CC:DD:EE:FF）。
+      required: true
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    model:
+      name: 协议分支
+      description: auto 会先读取 Service UUID/设备名再判断。
+      required: false
+      selector:
+        select:
+          options:
+            - auto
+            - general
+            - led
+            - qingzhou
+            - mjl
+            - wst
+    wait_notify:
+      name: 等待 notify
+      description: 写入后最多等待 3 秒的任意 notify，作为设备确认。
+      required: false
+      selector:
+        boolean:

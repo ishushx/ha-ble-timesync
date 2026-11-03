@@ -1,0 +1,24 @@
+# Python / Home Assistant
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# ESPHome build artifacts
+.esphome/
+*.bin
+*.uf2
+*.elf
+*.map
+
+# Secrets / local config
+secrets.yaml
+*.secret
+.env
+
+# Logs / editor / OS
+*.log
+.DS_Store
+.idea/
+.vscode/
